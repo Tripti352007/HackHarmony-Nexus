@@ -385,7 +385,19 @@ html,body{font-family:var(--fb);background:var(--bg);color:var(--tx);overflow-x:
       <button class="att og" id="ta-re" onclick="switchTab('register')">Register / पंजीकरण</button>
     </div>
     <div id="f-login" class="auth-form">
-      <div class="fg"><label>Mobile Number <span class="lh h">मोबाइल नंबर</span></label><input type="tel" id="li-ph" placeholder="10-digit mobile" maxlength="10"/></div>
+      <div class="fg" style="margin-bottom:14px">
+        <label style="margin-bottom:8px">Login With <span class="lh h">लॉगिन करें</span></label>
+        <div style="display:flex;gap:8px">
+          <button class="ub on" id="li-mob-toggle" onclick="switchLoginType('mobile',this)" style="flex:1;background:var(--gr);color:#fff;border-color:var(--gr)">📱 Mobile</button>
+          <button class="ub" id="li-email-toggle" onclick="switchLoginType('email',this)" style="flex:1;border-color:var(--br2)">✉️ Email</button>
+        </div>
+      </div>
+      <div id="li-mobile-section">
+        <div class="fg"><label>Mobile Number <span class="lh h">मोबाइल नंबर</span></label><input type="tel" id="li-ph" placeholder="10-digit mobile" maxlength="10"/></div>
+      </div>
+      <div id="li-email-section" style="display:none">
+        <div class="fg"><label>Email Address <span class="lh h">ईमेल पता</span></label><input type="email" id="li-email" placeholder="your@email.com"/></div>
+      </div>
       <div class="fg"><label>Password <span class="lh h">पासवर्ड</span></label><input type="password" id="li-pw" placeholder="Password"/></div>
       <div class="loc-box" onclick="getLoc('li')" id="lb-li">
         <span style="font-size:22px">📍</span>
@@ -393,12 +405,24 @@ html,body{font-family:var(--fb);background:var(--bg);color:var(--tx);overflow-x:
         <span class="loc-ok" id="li-lok">✓ Done</span>
       </div>
       <button class="sbtn sbtn-g" id="li-btn" onclick="doLogin()">Login / लॉगिन करें</button>
-      <div class="demo-note">Demo: any 10-digit phone + any password. Tap 📍 for GPS.</div>
+      <div class="demo-note">Demo: any 10-digit phone/email + any password. Tap 📍 for GPS.</div>
     </div>
     <div id="f-reg" class="auth-form" style="display:none">
+      <div class="fg" style="margin-bottom:14px">
+        <label style="margin-bottom:8px">Register With <span class="lh h">पंजीकरण करें</span></label>
+        <div style="display:flex;gap:8px">
+          <button class="ub on" id="re-mob-toggle" onclick="switchRegType('mobile',this)" style="flex:1;background:var(--gr);color:#fff;border-color:var(--gr)">📱 Mobile</button>
+          <button class="ub" id="re-email-toggle" onclick="switchRegType('email',this)" style="flex:1;border-color:var(--br2)">✉️ Email</button>
+        </div>
+      </div>
       <div class="frow">
         <div class="fg"><label>Full Name <span class="lh h">नाम</span></label><input type="text" id="re-nm" placeholder="Your name"/></div>
-        <div class="fg"><label>Mobile <span class="lh h">मोबाइल</span></label><input type="tel" id="re-ph" placeholder="10-digit" maxlength="10"/></div>
+        <div id="re-contact-section">
+          <div class="fg"><label>Mobile <span class="lh h">मोबाइल</span></label><input type="tel" id="re-ph" placeholder="10-digit" maxlength="10"/></div>
+        </div>
+        <div id="re-email-section" style="display:none">
+          <div class="fg"><label>Email <span class="lh h">ईमेल</span></label><input type="email" id="re-email" placeholder="your@email.com"/></div>
+        </div>
       </div>
       <div class="fg"><label>Village / Area <span class="lh h">गाँव / क्षेत्र</span></label><input type="text" id="re-ar" placeholder="e.g. Sector 12, Civil Lines"/></div>
       <div class="fg" id="re-sk-fg" style="display:none"><label>Your Skills <span class="lh h">कौशल (comma-separated)</span></label><input type="text" id="re-sk" placeholder="e.g. driving, cooking, first-aid"/></div>
@@ -409,7 +433,7 @@ html,body{font-family:var(--fb);background:var(--bg);color:var(--tx);overflow-x:
         <span class="loc-ok" id="re-lok">✓ Captured</span>
       </div>
       <button class="sbtn sbtn-g" id="re-btn" onclick="doReg()">Register & Continue / आगे बढ़ें</button>
-      <div class="demo-note">Fill name, phone, password. Location is recommended.</div>
+      <div class="demo-note">Fill name, phone/email, password. Location is recommended.</div>
     </div>
   </div>
 </div>
@@ -737,24 +761,91 @@ function switchTab(t){
   document.getElementById('ta-li').classList.toggle('on',t==='login');
   document.getElementById('ta-re').classList.toggle('on',t==='register');
 }
+function switchLoginType(type,btn){
+  document.querySelectorAll('#f-login .ub').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  if(type==='mobile'){
+    document.getElementById('li-mobile-section').style.display='block';
+    document.getElementById('li-email-section').style.display='none';
+    document.getElementById('li-ph').value='';
+    document.getElementById('li-email').value='';
+  } else {
+    document.getElementById('li-mobile-section').style.display='none';
+    document.getElementById('li-email-section').style.display='block';
+    document.getElementById('li-ph').value='';
+    document.getElementById('li-email').value='';
+  }
+}
+function switchRegType(type,btn){
+  document.querySelectorAll('#f-reg .ub').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  if(type==='mobile'){
+    document.getElementById('re-contact-section').style.display='block';
+    document.getElementById('re-email-section').style.display='none';
+    document.getElementById('re-ph').value='';
+    document.getElementById('re-email').value='';
+  } else {
+    document.getElementById('re-contact-section').style.display='none';
+    document.getElementById('re-email-section').style.display='block';
+    document.getElementById('re-ph').value='';
+    document.getElementById('re-email').value='';
+  }
+}
 function doLogin(){
-  const ph=document.getElementById('li-ph').value.trim(),pw=document.getElementById('li-pw').value;
-  if(!ph||!pw){toast('Enter phone and password','फ़ोन और पासवर्ड डालें');return}
-  if(ph.length<10){toast('Enter 10-digit number','10 अंकों का नंबर डालें');return}
+  const ph=document.getElementById('li-ph').value.trim();
+  const email=document.getElementById('li-email').value.trim();
+  const pw=document.getElementById('li-pw').value;
+  const loginType=document.getElementById('li-mobile-section').style.display==='none'?'email':'mobile';
+  
+  if(loginType==='mobile'){
+    if(!ph||!pw){toast('Enter phone and password','फ़ोन और पासवर्ड डालें');return}
+    if(ph.length<10){toast('Enter 10-digit number','10 अंकों का नंबर डालें');return}
+  } else {
+    if(!email||!pw){toast('Enter email and password','ईमेल और पासवर्ड डालें');return}
+    if(!email.includes('@')){toast('Invalid email','गलत ईमेल');return}
+  }
+  
   if(!loc)loc={lat:BASE_LAT,lng:BASE_LNG};
   user=role==='volunteer'
-    ?{name:'Raj Kumar',phone:ph,area:'Civil Lines, Sirsa',skills:['driving','care','logistics'],init:'RK'}
-    :{name:'Ritu Sharma',phone:ph,area:'Sector 12, Sirsa',init:'RS'};
+    ?{name:'Raj Kumar',phone:ph||'9876543210',email:email||'',area:'Civil Lines, Sirsa',skills:['driving','care','logistics'],init:'RK'}
+    :{name:'Ritu Sharma',phone:ph||'9876543210',email:email||'',area:'Sector 12, Sirsa',init:'RS'};
   afterAuth();
 }
 function doReg(){
-  const nm=document.getElementById('re-nm').value.trim(),ph=document.getElementById('re-ph').value.trim();
-  const ar=document.getElementById('re-ar').value.trim(),pw=document.getElementById('re-pw').value;
-  if(!nm||!ph||!pw){toast('Fill name, phone and password','नाम, फ़ोन और पासवर्ड भरें');return}
-  if(ph.length<10){toast('10-digit number required','10 अंकों का नंबर चाहिए');return}
+  const nm=document.getElementById('re-nm').value.trim();
+  const ph=document.getElementById('re-ph').value.trim();
+  const email=document.getElementById('re-email').value.trim();
+  const ar=document.getElementById('re-ar').value.trim();
+  const pw=document.getElementById('re-pw').value;
+  const regType=document.getElementById('re-contact-section').style.display==='none'?'email':'mobile';
+  
+  if(!nm||!pw){toast('Fill name and password','नाम और पासवर्ड भरें');return}
+  
+  if(regType==='mobile'){
+    if(!ph){toast('Enter mobile number','मोबाइल नंबर दर्ज करें');return}
+    if(ph.length<10){toast('10-digit number required','10 अंकों का नंबर चाहिए');return}
+  } else {
+    if(!email){toast('Enter email address','ईमेल पता दर्ज करें');return}
+    if(!email.includes('@')){toast('Invalid email','गलत ईमेल');return}
+  }
+  
   if(pw.length<4){toast('Password: min 4 chars','पासवर्ड कम से कम 4 अक्षर');return}
   if(!loc)loc={lat:rnd(BASE_LAT,.02),lng:rnd(BASE_LNG,.02)};
-  user={name:nm,phone:ph,area:ar||'Your Area',skills:document.getElementById('re-sk').value.trim().split(',').map(s=>s.trim()).filter(Boolean),init:nm.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'U'};
+  user={name:nm,phone:ph||'9876543210',email:email||'',area:ar||'Your Area',skills:document.getElementById('re-sk').value.trim().split(',').map(s=>s.trim()).filter(Boolean),init:nm.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'U'};
+  
+  // Save to Supabase
+  saveUserToSupabase({
+    name: nm,
+    phone: ph || '',
+    email: email || '',
+    role: role,
+    area: ar || 'Your Area',
+    skills: document.getElementById('re-sk').value.trim().split(',').map(s=>s.trim()).filter(Boolean),
+    password: pw,
+    latitude: loc.lat,
+    longitude: loc.lng
+  });
+  
   afterAuth();
 }
 function afterAuth(){
@@ -848,6 +939,19 @@ function submitReq(){
     dist:+(Math.random()*1.5+0.2).toFixed(1),time:'Just now',
     lat:loc.lat+rnd(0,.006),lng:loc.lng+rnd(0,.006),chat:[]};
   reqs.unshift(newR);
+  
+  // Save to Supabase
+  saveRequestToSupabase({
+    name: user.name,
+    location: addr || user.area,
+    need: cat(cid).en,
+    urgency: urgSel,
+    description: desc,
+    phone: user.phone,
+    latitude: newR.lat,
+    longitude: newR.lng
+  });
+  
   selCats.clear();
   document.querySelectorAll('.ct').forEach(t=>t.classList.remove('sel'));
   document.querySelectorAll('.ct-chk').forEach(c=>c.textContent='');
@@ -1180,6 +1284,79 @@ document.addEventListener('click',e=>{
     document.getElementById('notif-panel').classList.remove('show');
   if(e.target===document.getElementById('chat-overlay'))closeChat();
 });
+
+/* ════════ SUPABASE INTEGRATION ════════ */
+const SUPABASE_URL = "https://csyglkpwckewxwvqzjon.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_Dx6iMjc76WOw2YRXVE3GgQ_6kV9JAvz";
+
+async function saveUserToSupabase(userData) {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({
+        name: userData.name,
+        phone: userData.phone,
+        email: userData.email,
+        role: userData.role,
+        area: userData.area,
+        skills: userData.skills || [],
+        latitude: userData.latitude,
+        longitude: userData.longitude
+      })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Supabase error:', error);
+      return;
+    }
+    
+    const result = await response.json();
+    console.log('User saved to Supabase:', result);
+    toast('Profile saved to database!','प्रोफाइल डेटाबेस में सहेजा गया!');
+  } catch (error) {
+    console.error('Error saving to Supabase:', error);
+  }
+}
+
+async function saveRequestToSupabase(requestData) {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/requests`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({
+        name: requestData.name,
+        location: requestData.location,
+        need: requestData.need,
+        urgency: requestData.urgency,
+        description: requestData.description,
+        phone: requestData.phone,
+        latitude: requestData.latitude,
+        longitude: requestData.longitude
+      })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Supabase error:', error);
+      return;
+    }
+    
+    const result = await response.json();
+    console.log('Request saved to Supabase:', result);
+  } catch (error) {
+    console.error('Error saving request to Supabase:', error);
+  }
+}
 
 /* ════════ INIT ════════ */
 buildCatGrid();

@@ -1,5 +1,5 @@
 // ================= IMPORT FIREBASE FUNCTIONS =================
-import { addRequest, getRequests, subscribeToRequests } from "./firebase.js";
+import { addRequest, getRequests, subscribeToRequests } from "./supabase.js";
 
 
 // ================= BASIC TEST (RUN ON LOAD) =================
