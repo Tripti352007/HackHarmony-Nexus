@@ -806,9 +806,28 @@ function doLogin(){
   }
   
   if(!loc)loc={lat:BASE_LAT,lng:BASE_LNG};
-  user=role==='volunteer'
-    ?{name:'Raj Kumar',phone:ph||'9876543210',email:email||'',area:'Civil Lines, Sirsa',skills:['driving','care','logistics'],init:'RK'}
-    :{name:'Ritu Sharma',phone:ph||'9876543210',email:email||'',area:'Sector 12, Sirsa',init:'RS'};
+  
+  // Retrieve stored user data for the logged-in phone/email
+  const contact = loginType === 'mobile' ? ph : email;
+  const storedUsers = JSON.parse(localStorage.getItem('sahayta_users') || '{}');
+  const storedUserData = storedUsers[contact];
+  
+  if(storedUserData && storedUserData.role === role) {
+    // User exists - load their registered data
+    user = {
+      name: storedUserData.name,
+      phone: storedUserData.phone || ph || '9876543210',
+      email: storedUserData.email || email || '',
+      area: storedUserData.area || 'Your Area',
+      skills: storedUserData.skills || [],
+      init: storedUserData.init || 'U'
+    };
+  } else {
+    // First-time login or role mismatch - create with demo data but use provided contact
+    user=role==='volunteer'
+      ?{name:'Raj Kumar',phone:ph||'9876543210',email:email||'',area:'Civil Lines, Sirsa',skills:['driving','care','logistics'],init:'RK'}
+      :{name:'Ritu Sharma',phone:ph||'9876543210',email:email||'',area:'Sector 12, Sirsa',init:'RS'};
+  }
   afterAuth();
 }
 function doReg(){
@@ -831,7 +850,24 @@ function doReg(){
   
   if(pw.length<4){toast('Password: min 4 chars','पासवर्ड कम से कम 4 अक्षर');return}
   if(!loc)loc={lat:rnd(BASE_LAT,.02),lng:rnd(BASE_LNG,.02)};
-  user={name:nm,phone:ph||'9876543210',email:email||'',area:ar||'Your Area',skills:document.getElementById('re-sk').value.trim().split(',').map(s=>s.trim()).filter(Boolean),init:nm.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'U'};
+  
+  const skills = document.getElementById('re-sk').value.trim().split(',').map(s=>s.trim()).filter(Boolean);
+  const userInit = nm.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'U';
+  user={name:nm,phone:ph||'9876543210',email:email||'',area:ar||'Your Area',skills:skills,init:userInit};
+  
+  // Save user to localStorage for login retrieval
+  const contact = regType === 'mobile' ? ph : email;
+  const storedUsers = JSON.parse(localStorage.getItem('sahayta_users') || '{}');
+  storedUsers[contact] = {
+    name: nm,
+    phone: ph || '',
+    email: email || '',
+    role: role,
+    area: ar || 'Your Area',
+    skills: skills,
+    init: userInit
+  };
+  localStorage.setItem('sahayta_users', JSON.stringify(storedUsers));
   
   // Save to Supabase
   saveUserToSupabase({
@@ -840,7 +876,7 @@ function doReg(){
     email: email || '',
     role: role,
     area: ar || 'Your Area',
-    skills: document.getElementById('re-sk').value.trim().split(',').map(s=>s.trim()).filter(Boolean),
+    skills: skills,
     password: pw,
     latitude: loc.lat,
     longitude: loc.lng
